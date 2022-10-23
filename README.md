@@ -1,4 +1,4 @@
-dumpgpt-go (v0.2.0)
+dumpgpt-go ([v0.2.1](https://github.com/kusumi/dumpgpt-go/releases/tag/v0.2.1))
 ========
 
 ## About
@@ -7,16 +7,30 @@ dumpgpt-go (v0.2.0)
 
 + Go version of [https://github.com/kusumi/dumpgpt](https://github.com/kusumi/dumpgpt).
 
-## Build
+## Requirements
 
-Run make(1) or gmake(1).
+go 1.18 or above
+
+## Build
 
     $ make
 
+or
+
+    $ gmake
+
 ## Usage
 
-    $ ./dumpgpt
-    usage: ./dumpgpt: [--verbose] [--symbol] [--noalt] [-v] [-h] [-u] <gpt_image_path>
+    $ ./dumpgpt-go
+    usage: dumpgpt-go: [<options>] <path>
+      -h    Print usage and exit
+      -noalt
+            Do not dump secondary header and entries
+      -symbol
+            Print symbol name if possible
+      -v    Print version and exit
+      -verbose
+            Enable verbose print
 
 ## Resource
 

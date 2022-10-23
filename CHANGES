@@ -1,3 +1,8 @@
+v0.2.1
+======
+- Minor fixes
+- Rename executable from dumpgpt to dumpgpt-go
+
 v0.2.0
 ======
 - Initial release

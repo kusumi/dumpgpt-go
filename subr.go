@@ -99,8 +99,12 @@ func isLe() bool {
 }
 
 func assert(c bool) {
+	kassert(c, "Assert failed")
+}
+
+func kassert(c bool, err interface{}) {
 	if !c {
-		panic("Assertion")
+		panic(err)
 	}
 }
 

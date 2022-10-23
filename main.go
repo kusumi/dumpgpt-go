@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 )
 
 var (
-	version        [3]int = [3]int{0, 2, 0}
+	version        [3]int = [3]int{0, 2, 1}
 	dumpOptVerbose bool
 	dumpOptSymbol  bool
 	dumpOptNoalt   bool
@@ -21,32 +22,25 @@ func printVersion() {
 }
 
 func usage(progname string) {
-	fmt.Fprintln(os.Stderr, "usage: "+progname+": "+
-		"[--verbose] "+
-		"[--symbol] "+
-		"[--noalt] "+
-		"[-v] "+
-		"[-h] "+
-		"[-u] "+
-		"<gpt_image_path>")
+	fmt.Fprintln(os.Stderr, "usage: "+progname+": [<options>] <path>")
+	flag.PrintDefaults()
 }
 
 func main() {
 	assertDs()
 
-	progname := os.Args[0]
+	progname := path.Base(os.Args[0])
 
 	if !isLe() {
-		fmt.Fprintln(os.Stderr, "big-endian arch unsupported")
+		fmt.Println("big-endian arch unsupported")
 		os.Exit(1)
 	}
 
-	opt_verbose := flag.Bool("verbose", false, "")
-	opt_symbol := flag.Bool("symbol", false, "")
-	opt_noalt := flag.Bool("noalt", false, "")
-	opt_version := flag.Bool("v", false, "")
-	opt_help_h := flag.Bool("h", false, "")
-	opt_help_u := flag.Bool("u", false, "")
+	opt_verbose := flag.Bool("verbose", false, "Enable verbose print")
+	opt_symbol := flag.Bool("symbol", false, "Print symbol name if possible")
+	opt_noalt := flag.Bool("noalt", false, "Do not dump secondary header and entries")
+	opt_version := flag.Bool("v", false, "Print version and exit")
+	opt_help_h := flag.Bool("h", false, "Print usage and exit")
 
 	flag.Parse()
 	args := flag.Args()
@@ -59,7 +53,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *opt_help_h || *opt_help_u {
+	if *opt_help_h {
 		usage(progname)
 		os.Exit(1)
 	}
@@ -75,12 +69,14 @@ func main() {
 
 	fp, err := os.Open(device)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	defer fp.Close()
 
 	err = dumpGpt(fp)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

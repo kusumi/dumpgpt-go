@@ -7,14 +7,12 @@ import (
 
 func Test_uuidToStr(t *testing.T) {
 	u := &uuid{}
-	s := uuidToStr(u)
-	if s != "00000000-0000-0000-0000-000000000000" {
+	if s := uuidToStr(u); s != "00000000-0000-0000-0000-000000000000" {
 		t.Error(s)
 	}
 
 	u = &uuid{0x516e7cb4, 0x6ecf, 0x11d6, 0x8f, 0xf8, [UUID_NODE_LEN]uint8{0x00, 0x02, 0x2d, 0x09, 0x71, 0x2b}}
-	s = uuidToStr(u)
-	if s != "516e7cb4-6ecf-11d6-8ff8-00022d09712b" {
+	if s := uuidToStr(u); s != "516e7cb4-6ecf-11d6-8ff8-00022d09712b" {
 		t.Error(s)
 	}
 }
@@ -49,20 +47,17 @@ func Test_knownUuid(t *testing.T) {
 
 func Test_knownUuidToStr(t *testing.T) {
 	u := &uuid{}
-	s := knownUuidToStr(u)
-	if s != "UNUSED" {
+	if s := knownUuidToStr(u); s != "UNUSED" {
 		t.Error(s)
 	}
 
 	u = &uuid{0x516e7cb4, 0x6ecf, 0x11d6, 0x8f, 0xf8, [UUID_NODE_LEN]uint8{0x00, 0x02, 0x2d, 0x09, 0x71, 0x2b}}
-	s = knownUuidToStr(u)
-	if s != "FREEBSD" {
+	if s := knownUuidToStr(u); s != "FREEBSD" {
 		t.Error(s)
 	}
 
 	u = &uuid{0x416e7cb4, 0x6ecf, 0x11d6, 0x8f, 0xf8, [UUID_NODE_LEN]uint8{0x00, 0x02, 0x2d, 0x09, 0x71, 0x2b}}
-	s = knownUuidToStr(u)
-	if s != "" {
+	if s := knownUuidToStr(u); s != "" {
 		t.Error(s)
 	}
 }

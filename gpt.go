@@ -37,18 +37,13 @@ type gptEnt struct {
 }
 
 func tryKnownUuidToStr(uuid *uuid) string {
-	var s string
-
 	if dumpOptSymbol {
-		s = knownUuidToStr(uuid)
-		if s == "" {
-			s = uuidToStr(uuid)
+		if s := knownUuidToStr(uuid); s != "" {
+			return s
 		}
-	} else {
-		s = uuidToStr(uuid)
 	}
 
-	return s
+	return uuidToStr(uuid)
 }
 
 func allocBuffer() []byte {
@@ -67,8 +62,7 @@ func dumpHeader(fp *os.File, hdr_lba uint64) (*gptHdr, error) {
 
 	hdr_offset := hdr_lba * uint64(len(buf))
 
-	ret, err := fp.ReadAt(buf, int64(hdr_offset))
-	if err != nil {
+	if ret, err := fp.ReadAt(buf, int64(hdr_offset)); err != nil {
 		return nil, err
 	} else if ret != len(buf) {
 		return nil, errors.New("failed to read")
@@ -77,7 +71,9 @@ func dumpHeader(fp *os.File, hdr_lba uint64) (*gptHdr, error) {
 	hdr := gptHdr{}
 	n := int(unsafe.Sizeof(hdr))
 	r := bytes.NewReader(buf[:n])
-	binary.Read(r, binary.LittleEndian, &hdr)
+	if err := binary.Read(r, binary.LittleEndian, &hdr); err != nil {
+		return nil, err
+	}
 
 	l1 := []byte("EFI PART")
 	l2 := []byte(hdr.Hdr_sig[:])
@@ -134,8 +130,7 @@ func dumpEntries(fp *os.File, hdr *gptHdr) error {
 
 	for i := 0; i < int(lba_table_sectors); i++ {
 		offset := (hdr.Hdr_lba_table + uint64(i)) * uint64(len(buf))
-		ret, err := fp.ReadAt(buf, int64(offset))
-		if err != nil {
+		if ret, err := fp.ReadAt(buf, int64(offset)); err != nil {
 			return err
 		} else if ret != len(buf) {
 			return errors.New("failed to read")
@@ -148,7 +143,10 @@ func dumpEntries(fp *os.File, hdr *gptHdr) error {
 			p := gptEnt{}
 			n := int(unsafe.Sizeof(p))
 			r := bytes.NewReader(buf[entry_offset : entry_offset+n])
-			binary.Read(r, binary.LittleEndian, &p)
+			if err := binary.Read(r, binary.LittleEndian, &p); err != nil {
+				return err
+			}
+
 			entry_offset += n
 
 			empty := gptEnt{}
