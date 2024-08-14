@@ -31,10 +31,10 @@ func Test_knownUuid(t *testing.T) {
 			if a.name == b.name {
 				t.Error(a.name, b.name)
 			}
-			if a.name == "" {
+			if len(a.name) == 0 {
 				t.Error(a.name)
 			}
-			if b.name == "" {
+			if len(b.name) == 0 {
 				t.Error(b.name)
 			}
 		}
@@ -57,7 +57,7 @@ func Test_knownUuidToStr(t *testing.T) {
 	}
 
 	u = &uuid{0x416e7cb4, 0x6ecf, 0x11d6, 0x8f, 0xf8, [UUID_NODE_LEN]uint8{0x00, 0x02, 0x2d, 0x09, 0x71, 0x2b}}
-	if s := knownUuidToStr(u); s != "" {
+	if s := knownUuidToStr(u); len(s) != 0 {
 		t.Error(s)
 	}
 }

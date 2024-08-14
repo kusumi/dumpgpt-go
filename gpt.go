@@ -10,35 +10,35 @@ import (
 )
 
 type gptHdr struct {
-	Hdr_sig       [8]uint8
-	Hdr_revision  uint32
-	Hdr_size      uint32
-	Hdr_crc_self  uint32
-	Reserved      uint32
-	Hdr_lba_self  uint64
-	Hdr_lba_alt   uint64
-	Hdr_lba_start uint64
-	Hdr_lba_end   uint64
-	Hdr_uuid      uuid
-	Hdr_lba_table uint64
-	Hdr_entries   uint32
-	Hdr_entsz     uint32
-	Hdr_crc_table uint32
-	Padding       uint32
+	HdrSig      [8]uint8
+	HdrRevision uint32
+	HdrSize     uint32
+	HdrCrcSelf  uint32
+	Reserved    uint32
+	HdrLbaSelf  uint64
+	HdrLbaAlt   uint64
+	HdrLbaStart uint64
+	HdrLbaEnd   uint64
+	HdrUuid     uuid
+	HdrLbaTable uint64
+	HdrEntries  uint32
+	HdrEntsz    uint32
+	HdrCrcTable uint32
+	Padding     uint32
 }
 
 type gptEnt struct {
-	Ent_type      uuid
-	Ent_uuid      uuid
-	Ent_lba_start uint64
-	Ent_lba_end   uint64
-	Ent_attr      uint64
-	Ent_name      [36]uint16
+	EntType     uuid
+	EntUuid     uuid
+	EntLbaStart uint64
+	EntLbaEnd   uint64
+	EntAttr     uint64
+	EntName     [36]uint16
 }
 
 func tryKnownUuidToStr(uuid *uuid) string {
-	if dumpOptSymbol {
-		if s := knownUuidToStr(uuid); s != "" {
+	if optSymbol {
+		if s := knownUuidToStr(uuid); len(s) != 0 {
 			return s
 		}
 	}
@@ -57,12 +57,12 @@ func allocBuffer() []byte {
 	return buf
 }
 
-func dumpHeader(fp *os.File, hdr_lba uint64) (*gptHdr, error) {
+func dumpHeader(fp *os.File, hdrLba uint64) (*gptHdr, error) {
 	buf := allocBuffer()
 
-	hdr_offset := hdr_lba * uint64(len(buf))
+	hdrOffset := hdrLba * uint64(len(buf))
 
-	if ret, err := fp.ReadAt(buf, int64(hdr_offset)); err != nil {
+	if ret, err := fp.ReadAt(buf, int64(hdrOffset)); err != nil {
 		return nil, err
 	} else if ret != len(buf) {
 		return nil, errors.New("failed to read")
@@ -76,42 +76,41 @@ func dumpHeader(fp *os.File, hdr_lba uint64) (*gptHdr, error) {
 	}
 
 	l1 := []byte("EFI PART")
-	l2 := []byte(hdr.Hdr_sig[:])
+	l2 := []byte(hdr.HdrSig[:])
 	if !bytes.Equal(l1, l2) {
 		return nil, errors.New("not GPT")
 	}
 
 	fmt.Printf("sig      = \"%c%c%c%c%c%c%c%c\"\n",
-		hdr.Hdr_sig[0],
-		hdr.Hdr_sig[1],
-		hdr.Hdr_sig[2],
-		hdr.Hdr_sig[3],
-		hdr.Hdr_sig[4],
-		hdr.Hdr_sig[5],
-		hdr.Hdr_sig[6],
-		hdr.Hdr_sig[7])
+		hdr.HdrSig[0],
+		hdr.HdrSig[1],
+		hdr.HdrSig[2],
+		hdr.HdrSig[3],
+		hdr.HdrSig[4],
+		hdr.HdrSig[5],
+		hdr.HdrSig[6],
+		hdr.HdrSig[7])
 
 	p := make([]byte, 4)
-	binary.LittleEndian.PutUint32(p, hdr.Hdr_revision)
-	fmt.Printf("revision = %02x %02x %02x %02x\n",
-		p[0], p[1], p[2], p[3])
+	binary.LittleEndian.PutUint32(p, hdr.HdrRevision)
+	fmt.Printf("revision = %02x %02x %02x %02x\n", p[0], p[1], p[2], p[3])
 
-	fmt.Printf("size     = %d\n", hdr.Hdr_size)
-	fmt.Printf("crc_self = 0x%x\n", hdr.Hdr_crc_self)
-	fmt.Printf("lba_self = 0x%016x\n", hdr.Hdr_lba_self)
-	fmt.Printf("lba_alt  = 0x%016x\n", hdr.Hdr_lba_alt)
-	fmt.Printf("lba_start= 0x%016x\n", hdr.Hdr_lba_start)
-	fmt.Printf("lba_end  = 0x%016x\n", hdr.Hdr_lba_end)
+	fmt.Printf("size     = %d\n", hdr.HdrSize)
+	fmt.Printf("crc_self = 0x%x\n", hdr.HdrCrcSelf)
+	fmt.Printf("lba_self = 0x%016x\n", hdr.HdrLbaSelf)
+	fmt.Printf("lba_alt  = 0x%016x\n", hdr.HdrLbaAlt)
+	fmt.Printf("lba_start= 0x%016x\n", hdr.HdrLbaStart)
+	fmt.Printf("lba_end  = 0x%016x\n", hdr.HdrLbaEnd)
 
-	fmt.Printf("uuid     = %s\n", tryKnownUuidToStr(&hdr.Hdr_uuid))
+	fmt.Printf("uuid     = %s\n", tryKnownUuidToStr(&hdr.HdrUuid))
 
-	fmt.Printf("lba_table= 0x%016x\n", hdr.Hdr_lba_table)
-	fmt.Printf("entries  = %d\n", hdr.Hdr_entries)
-	fmt.Printf("entsz    = %d\n", hdr.Hdr_entsz)
-	fmt.Printf("crc_table= 0x%x\n", hdr.Hdr_crc_table)
+	fmt.Printf("lba_table= 0x%016x\n", hdr.HdrLbaTable)
+	fmt.Printf("entries  = %d\n", hdr.HdrEntries)
+	fmt.Printf("entsz    = %d\n", hdr.HdrEntsz)
+	fmt.Printf("crc_table= 0x%x\n", hdr.HdrCrcTable)
 
 	// XXX
-	if hdr.Hdr_entries > 512 {
+	if hdr.HdrEntries > 512 {
 		return nil, errors.New("likely corrupted entries")
 	}
 
@@ -121,36 +120,36 @@ func dumpHeader(fp *os.File, hdr_lba uint64) (*gptHdr, error) {
 func dumpEntries(fp *os.File, hdr *gptHdr) error {
 	buf := allocBuffer()
 
-	lba_table_size := hdr.Hdr_entsz * hdr.Hdr_entries
-	lba_table_sectors := lba_table_size / uint32(len(buf))
+	lbaTableSize := hdr.HdrEntsz * hdr.HdrEntries
+	lbaTableSectors := lbaTableSize / uint32(len(buf))
 	total := 0
 
 	fmt.Printf("%-3s %-36s %-36s %-16s %-16s %-16s %s\n",
 		"#", "type", "uniq", "lba_start", "lba_end", "attr", "name")
 
-	for i := 0; i < int(lba_table_sectors); i++ {
-		offset := (hdr.Hdr_lba_table + uint64(i)) * uint64(len(buf))
+	for i := 0; i < int(lbaTableSectors); i++ {
+		offset := (hdr.HdrLbaTable + uint64(i)) * uint64(len(buf))
 		if ret, err := fp.ReadAt(buf, int64(offset)); err != nil {
 			return err
 		} else if ret != len(buf) {
 			return errors.New("failed to read")
 		}
 
-		sector_entries := uint32(len(buf)) / hdr.Hdr_entsz
-		entry_offset := 0
+		sectorEntries := uint32(len(buf)) / hdr.HdrEntsz
+		entryOffset := 0
 
-		for j := 0; j < int(sector_entries); j++ {
+		for j := 0; j < int(sectorEntries); j++ {
 			p := gptEnt{}
 			n := int(unsafe.Sizeof(p))
-			r := bytes.NewReader(buf[entry_offset : entry_offset+n])
+			r := bytes.NewReader(buf[entryOffset : entryOffset+n])
 			if err := binary.Read(r, binary.LittleEndian, &p); err != nil {
 				return err
 			}
 
-			entry_offset += n
+			entryOffset += n
 
 			empty := gptEnt{}
-			if !dumpOptVerbose && p == empty {
+			if !optVerbose && p == empty {
 				total++
 				continue
 			}
@@ -158,7 +157,7 @@ func dumpEntries(fp *os.File, hdr *gptHdr) error {
 			name := make([]byte, 36)
 			nlen := 0
 			for k := 0; k < len(name); k++ {
-				name[k] = byte(p.Ent_name[k] & 0xFF) // XXX ascii
+				name[k] = byte(p.EntName[k] & 0xFF) // XXX ascii
 				if name[k] == 0 {
 					nlen = k
 					break
@@ -166,17 +165,17 @@ func dumpEntries(fp *os.File, hdr *gptHdr) error {
 			}
 
 			fmt.Printf("%-3d %-36s %-36s %016x %016x %016x %s\n",
-				i*int(sector_entries)+j,
-				tryKnownUuidToStr(&p.Ent_type),
-				tryKnownUuidToStr(&p.Ent_uuid),
-				p.Ent_lba_start,
-				p.Ent_lba_end,
-				p.Ent_attr,
+				i*int(sectorEntries)+j,
+				tryKnownUuidToStr(&p.EntType),
+				tryKnownUuidToStr(&p.EntUuid),
+				p.EntLbaStart,
+				p.EntLbaEnd,
+				p.EntAttr,
 				string(name[:nlen]))
 			total++
 		}
 	}
-	assert(total == int(hdr.Hdr_entries))
+	assert(total == int(hdr.HdrEntries))
 
 	return nil
 }
@@ -193,10 +192,10 @@ func dumpGpt(fp *os.File) error {
 	}
 
 	// secondary header
-	if !dumpOptNoalt {
+	if !optNoAlt {
 		fmt.Println("")
 		fmt.Println("secondary header")
-		hdr2, err = dumpHeader(fp, hdr1.Hdr_lba_alt)
+		hdr2, err = dumpHeader(fp, hdr1.HdrLbaAlt)
 		if err != nil {
 			return err
 		}
@@ -211,7 +210,7 @@ func dumpGpt(fp *os.File) error {
 	}
 
 	// secondary entries
-	if !dumpOptNoalt {
+	if !optNoAlt {
 		fmt.Println("")
 		fmt.Println("secondary entries")
 		err := dumpEntries(fp, hdr2)

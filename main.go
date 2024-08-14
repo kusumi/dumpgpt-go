@@ -8,17 +8,14 @@ import (
 )
 
 var (
-	version        [3]int = [3]int{0, 2, 1}
-	dumpOptVerbose bool
-	dumpOptSymbol  bool
-	dumpOptNoalt   bool
+	version    [3]int = [3]int{0, 2, 2}
+	optVerbose bool
+	optSymbol  bool
+	optNoAlt   bool
 )
 
 func printVersion() {
-	fmt.Printf("%d.%d.%d\n",
-		version[0],
-		version[1],
-		version[2])
+	fmt.Printf("%d.%d.%d\n", version[0], version[1], version[2])
 }
 
 func usage(progname string) {
@@ -36,24 +33,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	opt_verbose := flag.Bool("verbose", false, "Enable verbose print")
-	opt_symbol := flag.Bool("symbol", false, "Print symbol name if possible")
-	opt_noalt := flag.Bool("noalt", false, "Do not dump secondary header and entries")
-	opt_version := flag.Bool("v", false, "Print version and exit")
-	opt_help_h := flag.Bool("h", false, "Print usage and exit")
+	optVerboseAddr := flag.Bool("verbose", false, "Enable verbose print")
+	optSymbolAddr := flag.Bool("symbol", false, "Print symbol name if possible")
+	optNoAltAddr := flag.Bool("noalt", false, "Do not dump secondary header and entries")
+	optVersion := flag.Bool("v", false, "Print version and exit")
+	optHelp := flag.Bool("h", false, "Print usage and exit")
 
 	flag.Parse()
 	args := flag.Args()
-	dumpOptVerbose = *opt_verbose
-	dumpOptSymbol = *opt_symbol
-	dumpOptNoalt = *opt_noalt
+	optVerbose = *optVerboseAddr
+	optSymbol = *optSymbolAddr
+	optNoAlt = *optNoAltAddr
 
-	if *opt_version {
+	if *optVersion {
 		printVersion()
 		os.Exit(1)
 	}
 
-	if *opt_help_h {
+	if *optHelp {
 		usage(progname)
 		os.Exit(1)
 	}

@@ -1,11 +1,12 @@
-all:
-	go build -o dumpgpt-go
-fmt:
-	go fmt
-test:
-	go test -v
+bin:
+	go build
 clean:
 	go clean
-
+fmt:
+	go fmt
 lint:
 	golangci-lint run
+test:
+	go test -v
+
+xxx:	fmt lint test

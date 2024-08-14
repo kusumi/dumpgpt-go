@@ -1,4 +1,4 @@
-dumpgpt-go ([v0.2.1](https://github.com/kusumi/dumpgpt-go/releases/tag/v0.2.1))
+dumpgpt-go ([v0.2.2](https://github.com/kusumi/dumpgpt-go/releases/tag/v0.2.2))
 ========
 
 ## About
@@ -15,10 +15,6 @@ go 1.18 or above
 
     $ make
 
-or
-
-    $ gmake
-
 ## Usage
 
     $ ./dumpgpt-go
@@ -31,7 +27,3 @@ or
       -v    Print version and exit
       -verbose
             Enable verbose print
-
-## Resource
-
-[https://github.com/kusumi/dumpgpt-go/](https://github.com/kusumi/dumpgpt-go/)
